@@ -1,0 +1,19 @@
+{
+  "name": "wonsta-watcher",
+  "version": "1.0.0",
+  "description": "wonsta kubernetes watcher",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon --experimental-modules --es-module-specifier-resolution=node app.js"
+  },
+  "type": "module",
+  "author": "wonsta",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "node-fetch": "^3.0.0",
+    "nodemon": "^2.0.14"
+  }
+}
