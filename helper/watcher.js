@@ -1,7 +1,9 @@
 import axios from 'axios'
 import fetch from 'node-fetch'
 import https from 'https'
+import dotenv from 'dotenv'
 
+dotenv.config()
 //open watcher request
 export const openWatcher = () => {
   console.log('watcher running')
@@ -165,13 +167,11 @@ const postDataToWonsta = (data) => {
         handleType:'none',
         uid: '333',
         replicas: 1,
-        deploymentName: 'aeroplanemagc72-wordpress',
-        siteNamespace: 'aeroplane-magc72',
+        deploymentName: 'helicep1u9j-wordpress',
+        siteNamespace: 'helic-ep1u9j',
   }
 
-
-  axios
-    .post(api, tempData)
+  axios.post(api, tempData)
     .then((res) => console.log('tempData posted to wonsta monitor api:', res.data))
     .catch((error) => console.log('error in posting to monitor', error))
 }
