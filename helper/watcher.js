@@ -164,11 +164,12 @@ const postDataToWonsta = (data) => {
 
   let tempData={
         kind:'deployment',
-        handleType:'none',
+        handleType:'2021-11-09 22:13:38.561026000',
         uid: '333',
-        replicas: 1,
-        deploymentName: 'helicep1u9j-wordpress',
-        siteNamespace: 'helic-ep1u9j',
+        id:2,
+        replicas:5,
+        deploymentName: 'autoscale13bw8av-wordpress',
+        siteNamespace: 'autoscale1-3bw8av',
   }
 
   axios.post(api, tempData)
