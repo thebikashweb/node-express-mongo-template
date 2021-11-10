@@ -58,7 +58,7 @@ export const openWatcher = () => {
     }
   }
 
-  //streamUpdates()
+  streamUpdates()
 }
 
 //store data for each deployment to track the change
@@ -162,17 +162,9 @@ const postDataToWonsta = (data) => {
   }
   axios.defaults.headers = headers
 
-  let tempData={
-        kind:'deployment',
-        handleType:'2021-11-09 22:13:38.561026000',
-        uid: '333',
-        id:2,
-        replicas:5,
-        deploymentName: 'autoscale13bw8av-wordpress',
-        siteNamespace: 'autoscale1-3bw8av',
-  }
+  
 
-  axios.post(api, tempData)
+  axios.post(api, data)
     .then((res) => console.log('tempData posted to wonsta monitor api:', res.data))
     .catch((error) => console.log('error in posting to monitor', error))
 }
