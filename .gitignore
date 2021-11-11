@@ -6,6 +6,10 @@ node_modules/
 .env
 .env.test
 .env.prod
+.env.dev
+*.env 
+env.*
+
 
 # Nuxt.js build / generate output
 .nuxt
