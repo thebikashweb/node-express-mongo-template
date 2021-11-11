@@ -235,9 +235,9 @@ const postDataToWonsta = (data:any) => {
 
   
 
-  // axios.post(api, data)
-  //   .then((res) => console.log(`Data for site name space : ${data.object.metadata.namespace}, replicas:${data.object.status.replicas} posted to wonsta monitor api`, res.data))
-  //   .catch((error) => console.log('error in posting to monitor', error))
+  axios.post(api, data)
+    .then((res) => console.log(`Data for site name space : ${data.object.metadata.namespace}, replicas:${data.object.status.replicas} posted to wonsta monitor api`, res.data))
+    .catch((error) => console.log('error in posting to monitor', error))
 }
 
 openWatcher()
