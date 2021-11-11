@@ -1,5 +1,6 @@
 import axios from 'axios'
 import https from 'https'
+import util from 'util'
 
 //open watcher request
 const openWatcher = async() => {
@@ -12,8 +13,9 @@ const openWatcher = async() => {
       responseType: 'stream',
       })
 
-      data.on('data', (chunk) => {        
-        const utf8Decoder = new TextDecoder('utf-8')
+      data.on('data', (chunk) => {     
+        
+        const utf8Decoder = new util.TextDecoder('utf-8')
         let buffer = ''
 
         //previous function
