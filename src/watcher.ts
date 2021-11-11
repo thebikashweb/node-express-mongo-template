@@ -2,39 +2,45 @@ import axios from 'axios'
 import https from 'https'
 
 //open watcher request
-const openWatcher = () => {
-  const streamUpdates=()=> {
-    axios(`http://127.0.0.1:8001/apis/apps/v1/watch/deployments/`)
-      .then((response) => {
-        return response.data
+const openWatcher = async() => {
+    const url='http://127.0.0.1:8001/apis/apps/v1/watch/deployments/'
+  const streamUpdates=async()=> {
+
+      const {data} = await axios({
+      url,
+      method: 'GET',
+      responseType: 'stream',
       })
-      .then((res:any) =>
-        res.on('readable', () => {
-          let chunk = res.read()
-          const utf8Decoder = new TextDecoder('utf-8')
-          let buffer = ''
 
-          //previous function
+      data.on('data', (chunk) => {        
+        const utf8Decoder = new TextDecoder('utf-8')
+        let buffer = ''
 
-          buffer += utf8Decoder.decode(chunk)
-          const remainingBuffer = findLine(buffer, (line:any) => {
-            try {
-              const event = JSON.parse(line)             
-              //call handle data function
-              handleData(event)
-            } catch (error) {
-              console.log('Error while parsing', chunk, '\n', error)
-            }
-          })
-
-          buffer = remainingBuffer
+        //previous function
+        buffer += utf8Decoder.decode(chunk)
+        const remainingBuffer = findLine(buffer, (line:any) => {
+          try {
+            const event = JSON.parse(line)   
+            
+           
+            //call handle data function
+            handleData(event)
+          } catch (error) {
+            console.log('Error while parsing', chunk, '\n', error)
+          }
         })
-      )
-      .catch((error) => {
-        console.log('Error! Retrying in 5 seconds...', error)
-        setTimeout(() => streamUpdates(), 5000)
+
+        buffer = remainingBuffer
       })
 
+      //handle error and restart stream
+      data.on('error', (error) => {
+        console.log('Error! Retrying in 5 seconds...', error)
+        setTimeout(async() => await streamUpdates(), 5000)
+    })
+
+
+    //new line buffer 
     const findLine:any=(buffer:any, fn:any) =>{
       const newLineIndex = buffer.indexOf('\n')
       // if the buffer doesn't contain a new line, do nothing
@@ -50,9 +56,56 @@ const openWatcher = () => {
       // there could be more lines, checking again
       return findLine(newBuffer, fn)
     }
+  
+
+    // axios(`http://127.0.0.1:8001/apis/apps/v1/watch/deployments/`)
+    //   .then((response) => {  
+    //     return response.data
+    //   })
+    //   .then((res) =>
+    //     res.on('readable', () => {
+    //       let chunk = res.read()
+    //       const utf8Decoder = new TextDecoder('utf-8')
+    //       let buffer = ''
+
+    //       //previous function
+    //       buffer += utf8Decoder.decode(chunk)
+    //       const remainingBuffer = findLine(buffer, (line:any) => {
+    //         try {
+    //           const event = JSON.parse(line)             
+    //           //call handle data function
+    //           handleData(event)
+    //         } catch (error) {
+    //           console.log('Error while parsing', chunk, '\n', error)
+    //         }
+    //       })
+
+    //       buffer = remainingBuffer
+    //     })
+    //   )
+    //   .catch((error) => {
+    //     console.log('Error! Retrying in 5 seconds...', error)
+    //     setTimeout(async() => await streamUpdates(), 5000)
+    //   })
+
+    // const findLine:any=(buffer:any, fn:any) =>{
+    //   const newLineIndex = buffer.indexOf('\n')
+    //   // if the buffer doesn't contain a new line, do nothing
+    //   if (newLineIndex === -1) {
+    //     return buffer
+    //   }
+    //   const chunk = buffer.slice(0, buffer.indexOf('\n'))
+    //   const newBuffer = buffer.slice(buffer.indexOf('\n') + 1)
+
+    //   // found a new line! execute the callback
+    //   fn(chunk)
+
+    //   // there could be more lines, checking again
+    //   return findLine(newBuffer, fn)
+    // }
   }
 
-  streamUpdates()
+  await streamUpdates()
 }
 
 
@@ -71,7 +124,7 @@ let tempDeployments:TempDeploymentType[] = []
 //handle event and types
 const handleData = (data:any) => {
   //if namepsace is default or kube-system, do not run
-  if (data.object.metadata.namespace === 'kube-system' || data.object.metadata.namespace == 'default') {
+  if (data.object.metadata.namespace === 'kube-system' || data.object.metadata.namespace == 'default' || data.object.metadata.namespace == 'lens-metrics') {
     return;
   }
 
