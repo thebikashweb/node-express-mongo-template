@@ -7,107 +7,119 @@ const openWatcher = async() => {
     const url='http://127.0.0.1:8001/apis/apps/v1/watch/deployments/'
   const streamUpdates=async()=> {
 
+    try {
       const {data} = await axios({
-      url,
-      method: 'GET',
-      responseType: 'stream',
-      })
-
-      data.on('data', (chunk) => {     
-        
-        const utf8Decoder = new util.TextDecoder('utf-8')
-        let buffer = ''
-
-        //previous function
-        buffer += utf8Decoder.decode(chunk)
-        const remainingBuffer = findLine(buffer, (line:any) => {
-          try {
-            const event = JSON.parse(line)   
-            
-           
-            //call handle data function
-            handleData(event)
-          } catch (error) {
-            console.log('Error while parsing', chunk, '\n', error)
-          }
+        url,
+        method: 'GET',
+        responseType: 'stream',
         })
-
-        buffer = remainingBuffer
-      })
-
-      //handle error and restart stream
-      data.on('error', (error) => {
-        console.log('Error! Retrying in 5 seconds...', error)
-        setTimeout(async() => await streamUpdates(), 5000)
-    })
-
-
-    //new line buffer 
-    const findLine:any=(buffer:any, fn:any) =>{
-      const newLineIndex = buffer.indexOf('\n')
-      // if the buffer doesn't contain a new line, do nothing
-      if (newLineIndex === -1) {
-        return buffer
-      }
-      const chunk = buffer.slice(0, buffer.indexOf('\n'))
-      const newBuffer = buffer.slice(buffer.indexOf('\n') + 1)
-
-      // found a new line! execute the callback
-      fn(chunk)
-
-      // there could be more lines, checking again
-      return findLine(newBuffer, fn)
-    }
   
+        data.on('data', (chunk) => {     
+          
+          const utf8Decoder = new util.TextDecoder('utf-8')
+          let buffer = ''
+  
+          //previous function
+          buffer += utf8Decoder.decode(chunk)
+          const remainingBuffer = findLine(buffer, (line:any) => {
+            try {
+              const event = JSON.parse(line)   
+              
+             
+              //call handle data function
+              handleData(event)
+            } catch (error) {
+              console.log('Error while parsing', chunk, '\n', error)
+            }
+          })
+  
+          buffer = remainingBuffer
+        })
+  
+        //handle error and restart stream
+        data.on('error', (error) => {
+          console.log('Error in data axios data on stream ! Retrying in 5 seconds...')
+          setTimeout(async() => await streamUpdates(), 5000)
+      })
+  
+  
+      //new line buffer 
+      const findLine:any=(buffer:any, fn:any) =>{
+        const newLineIndex = buffer.indexOf('\n')
+        // if the buffer doesn't contain a new line, do nothing
+        if (newLineIndex === -1) {
+          return buffer
+        }
+        const chunk = buffer.slice(0, buffer.indexOf('\n'))
+        const newBuffer = buffer.slice(buffer.indexOf('\n') + 1)
+  
+        // found a new line! execute the callback
+        fn(chunk)
+  
+        // there could be more lines, checking again
+        return findLine(newBuffer, fn)
+      }
+    
+  
+      // axios(`http://127.0.0.1:8001/apis/apps/v1/watch/deployments/`)
+      //   .then((response) => {  
+      //     return response.data
+      //   })
+      //   .then((res) =>
+      //     res.on('readable', () => {
+      //       let chunk = res.read()
+      //       const utf8Decoder = new TextDecoder('utf-8')
+      //       let buffer = ''
+  
+      //       //previous function
+      //       buffer += utf8Decoder.decode(chunk)
+      //       const remainingBuffer = findLine(buffer, (line:any) => {
+      //         try {
+      //           const event = JSON.parse(line)             
+      //           //call handle data function
+      //           handleData(event)
+      //         } catch (error) {
+      //           console.log('Error while parsing', chunk, '\n', error)
+      //         }
+      //       })
+  
+      //       buffer = remainingBuffer
+      //     })
+      //   )
+      //   .catch((error) => {
+      //     console.log('Error! Retrying in 5 seconds...', error)
+      //     setTimeout(async() => await streamUpdates(), 5000)
+      //   })
+  
+      // const findLine:any=(buffer:any, fn:any) =>{
+      //   const newLineIndex = buffer.indexOf('\n')
+      //   // if the buffer doesn't contain a new line, do nothing
+      //   if (newLineIndex === -1) {
+      //     return buffer
+      //   }
+      //   const chunk = buffer.slice(0, buffer.indexOf('\n'))
+      //   const newBuffer = buffer.slice(buffer.indexOf('\n') + 1)
+  
+      //   // found a new line! execute the callback
+      //   fn(chunk)
+  
+      //   // there could be more lines, checking again
+      //   return findLine(newBuffer, fn)
+      // }
+      
+    } catch (error) {
+      console.log('Error! in making axios request')
+      setTimeout(async() => await streamUpdates(), 5000)
+    }
 
-    // axios(`http://127.0.0.1:8001/apis/apps/v1/watch/deployments/`)
-    //   .then((response) => {  
-    //     return response.data
-    //   })
-    //   .then((res) =>
-    //     res.on('readable', () => {
-    //       let chunk = res.read()
-    //       const utf8Decoder = new TextDecoder('utf-8')
-    //       let buffer = ''
-
-    //       //previous function
-    //       buffer += utf8Decoder.decode(chunk)
-    //       const remainingBuffer = findLine(buffer, (line:any) => {
-    //         try {
-    //           const event = JSON.parse(line)             
-    //           //call handle data function
-    //           handleData(event)
-    //         } catch (error) {
-    //           console.log('Error while parsing', chunk, '\n', error)
-    //         }
-    //       })
-
-    //       buffer = remainingBuffer
-    //     })
-    //   )
-    //   .catch((error) => {
-    //     console.log('Error! Retrying in 5 seconds...', error)
-    //     setTimeout(async() => await streamUpdates(), 5000)
-    //   })
-
-    // const findLine:any=(buffer:any, fn:any) =>{
-    //   const newLineIndex = buffer.indexOf('\n')
-    //   // if the buffer doesn't contain a new line, do nothing
-    //   if (newLineIndex === -1) {
-    //     return buffer
-    //   }
-    //   const chunk = buffer.slice(0, buffer.indexOf('\n'))
-    //   const newBuffer = buffer.slice(buffer.indexOf('\n') + 1)
-
-    //   // found a new line! execute the callback
-    //   fn(chunk)
-
-    //   // there could be more lines, checking again
-    //   return findLine(newBuffer, fn)
-    // }
+    
   }
 
-  await streamUpdates()
+  
+ 
+    await streamUpdates()
+    
+  
 }
 
 
@@ -138,7 +150,7 @@ const handleData = (data:any) => {
 
   //for modified action type
   const handleModified = () => {
-    console.log('Data: ', data)
+    console.log("Data log replicas : ", data.object.spec.replicas, "namepsace:",data.object.metadata.namespace)
     //find index of matched deployment in tempDeployments array
     let deploymentIndex = tempDeployments.findIndex(dep => dep.uid == data.object.metadata.uid)
 
@@ -223,9 +235,9 @@ const postDataToWonsta = (data:any) => {
 
   
 
-  axios.post(api, data)
-    .then((res) => console.log('tempData posted to wonsta monitor api:', res.data))
-    .catch((error) => console.log('error in posting to monitor', error))
+  // axios.post(api, data)
+  //   .then((res) => console.log(`Data for site name space : ${data.object.metadata.namespace}, replicas:${data.object.status.replicas} posted to wonsta monitor api`, res.data))
+  //   .catch((error) => console.log('error in posting to monitor', error))
 }
 
 openWatcher()
