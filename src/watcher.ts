@@ -138,7 +138,7 @@ let tempDeployments:TempDeploymentType[] = []
 //handle event and types
 const handleData = (data:any) => {
   //if namepsace is default or kube-system, do not run
-  if (data.object.metadata.namespace === 'kube-system' || data.object.metadata.namespace == 'default' || data.object.metadata.namespace == 'lens-metrics') {
+  if (data?.object?.metadata?.namespace === 'kube-system' || data?.object?.metadata?.namespace == 'default' || data?.object?.metadata?.namespace == 'lens-metrics') {
     return;
   }
 
@@ -150,18 +150,18 @@ const handleData = (data:any) => {
 
   //for modified action type
   const handleModified = () => {
-    console.log("Data log replicas : ", data.object.spec.replicas, "namepsace:",data.object.metadata.namespace)
+    console.log("Data log replicas : ", data?.object?.spec?.replicas, "namepsace:",data?.object?.metadata?.namespace)
     //find index of matched deployment in tempDeployments array
-    let deploymentIndex = tempDeployments.findIndex(dep => dep.uid == data.object.metadata.uid)
+    let deploymentIndex = tempDeployments.findIndex(dep => dep.uid == data?.object?.metadata?.uid)
 
     if (deploymentIndex >= 0) {
 
       //check if the replica has changed
-      if (tempDeployments[deploymentIndex].replicas !== data.object.spec.replicas) {
+      if (tempDeployments[deploymentIndex].replicas !== data?.object?.spec?.replicas) {
         //if replicas are not same as previous, it has changed
 
         //update array object
-        tempDeployments[deploymentIndex].replicas = data.object.spec.replicas
+        tempDeployments[deploymentIndex].replicas = data?.object?.spec?.replicas
 
         //post data to back-end
         postDataToWonsta(tempDeployments[deploymentIndex])
@@ -178,12 +178,12 @@ const handleData = (data:any) => {
     } else {
       //add this deployment to tempDeployment for tracking changes
       let tempDeployment = {
-        kind:data.object.kind,
+        kind:data?.object?.kind,
         handleType:'',
-        uid: data.object.metadata.uid,
-        replicas: data.object.status.replicas,
-        deploymentName: data.object.metadata.name,
-        siteNamespace: data.object.metadata.namespace,
+        uid: data?.object?.metadata?.uid,
+        replicas: data?.object?.status.replicas,
+        deploymentName: data?.object?.metadata?.name,
+        siteNamespace: data?.object?.metadata?.namespace,
       }
       tempDeployments.push(tempDeployment)
       //post data to wonsta backend
@@ -236,8 +236,11 @@ const postDataToWonsta = (data:any) => {
   
 
   axios.post(api, data)
-    .then((res) => console.log(`Data for site name space : ${data.object.metadata.namespace}, replicas:${data.object.status.replicas} posted to wonsta monitor api`, res.data))
-    .catch((error) => console.log('error in posting to monitor', error))
+    .then((res) => console.log(`Data for site name space : ${data?.object?.metadata?.namespace}, replicas:${data?.object?.status?.replicas} posted to wonsta monitor api`, res.data))
+    .catch((error) => {
+      console.log('error in posting to monitor', error)
+      setTimeout(async() =>openWatcher(), 10000)
+    })
 }
 
 openWatcher()
