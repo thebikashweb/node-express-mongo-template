@@ -4,7 +4,8 @@
   "license": "MIT",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon --config nodemon.json src/app.ts"
+    "start": "ts-node src/app.ts --env=production",
+    "dev": "nodemon --config nodemon.json src/app.ts"
   },
   "dependencies": {
     "axios": "^0.24.0",
