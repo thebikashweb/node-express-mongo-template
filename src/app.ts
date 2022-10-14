@@ -2,17 +2,13 @@ import express from "express";
 import dotenv from 'dotenv'
 dotenv.config()
 
-
-import   './watcher'
-
-
 const app = express();
 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const port=process.env.PORT || 3004
+const port=process.env.PORT || 5001
 
 //intialize the server
 const server=app.listen(port, () => console.log("Server up and running at port:",port))
